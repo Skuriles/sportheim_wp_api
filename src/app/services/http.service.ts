@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { TokenData } from "../classes/tokenData";
 
 @Injectable({
   providedIn: "root",
@@ -7,7 +8,7 @@ import { HttpClient, HttpHeaders } from "@angular/common/http";
 export class HttpService {
   constructor(private http: HttpClient) {}
 
-  public token = "";
+  public token: TokenData;
   private baseUrl = "http://localhost:65004/wptest_master/";
   private apiPrefix = this.baseUrl + "wp-json/";
   // private baseUrl = "http://sportheim.sv-deggenhausertal.de/";
@@ -33,6 +34,12 @@ export class HttpService {
     return this.postRequest(nodeUrl, body);
   }
 
+  public tokenCheck() {
+    const nodeUrl = this.baseUrl + "?rest_route=/admin/auth/validate";
+    // this.token.data.jwt;
+    return this.getAuthRequest(nodeUrl);
+  }
+
   // default http requests
   private postRequest(nodeUrl: string, body: any) {
     return this.http.post(nodeUrl, body);
@@ -44,7 +51,16 @@ export class HttpService {
 
   private postAuthRequest(nodeUrl: string, body: any) {
     return this.http.post(nodeUrl, body, {
-      headers: new HttpHeaders().set("Authorization", this.token),
+      headers: new HttpHeaders().set("authorization", this.token.data.jwt),
+    });
+  }
+
+  private getAuthRequest(nodeUrl: string) {
+    return this.http.get(nodeUrl, {
+      headers: new HttpHeaders().set(
+        "authorization",
+        "Bearer" + this.token.data.jwt
+      ),
     });
   }
 }
