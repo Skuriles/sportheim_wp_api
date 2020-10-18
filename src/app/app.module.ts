@@ -8,6 +8,7 @@ import { FormsModule } from "@angular/forms";
 import { MatInputModule } from "@angular/material/input";
 import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
+import { MatTableModule } from "@angular/material/table";
 
 import { StartComponent } from "./app.component";
 
@@ -25,6 +26,7 @@ import { AuthGuardService } from "./services/auth-guard.service";
     AppRoutingModule,
     MatInputModule,
     MatButtonModule,
+    MatTableModule,
     MatIconModule,
     HttpClientModule,
   ],

@@ -3,12 +3,12 @@ import {
   Router,
   CanActivate,
   ActivatedRouteSnapshot,
-  RouterStateSnapshot
+  RouterStateSnapshot,
 } from "@angular/router";
 import { HttpService } from "./http.service";
 
 @Injectable({
-  providedIn: "root"
+  providedIn: "root",
 })
 export class AuthGuardService implements CanActivate {
   constructor(private httpService: HttpService, private router: Router) {}
@@ -23,7 +23,7 @@ export class AuthGuardService implements CanActivate {
       }
       return true;
     }
-    if (this.httpService.token && this.httpService.token.length > 0) {
+    if (this.httpService.token && this.httpService.token.data.jwt.length > 0) {
       return true;
     }
     this.router.navigate(["start"]);
