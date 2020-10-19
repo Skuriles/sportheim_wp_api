@@ -36,8 +36,10 @@ export class HttpService {
 
   public tokenCheck() {
     const nodeUrl = this.baseUrl + "?rest_route=/admin/auth/validate";
-    // this.token.data.jwt;
-    return this.getAuthRequest(nodeUrl);
+    if (this.token && this.token.data.jwt) {
+      return this.getAuthRequest(nodeUrl);
+    }
+    return null;
   }
 
   public getAllData() {

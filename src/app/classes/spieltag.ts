@@ -7,4 +7,14 @@ export class Spieltag {
   public heim: string;
   public gast: string;
   public person: string;
+
+  public createFrom(element: Spieltag) {
+    this.tag = element.tag;
+    this.datum = element.datum;
+    this.uhrzeit = element.uhrzeit;
+    this.mannschaft = element.mannschaft;
+    this.heim = element.person;
+    this.gast = element.gast;
+    this.person = element.person;
+  }
 }

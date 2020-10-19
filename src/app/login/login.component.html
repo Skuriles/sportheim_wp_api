@@ -1,19 +1,25 @@
-  <div>
-    <mat-form-field>
+<div class="login">
+  <div class="info">Bitte Benutzername und Passwort eingeben</div>
+  <form class="example-form">
+    <mat-form-field class="example-full-width">
       <mat-label>Name eingeben</mat-label>
-      <input matInput type="text" [(ngModel)]="name" />
-      <button mat-button *ngIf="name" matSuffix mat-icon-button aria-label="Clear" (click)="name=''">
-        <mat-icon>close</mat-icon>
-      </button>
+      <input
+        matInput
+        placeholder="Dein name"
+        value=""
+        [(ngModel)]="name"
+        name="name"
+      />
     </mat-form-field>
-  </div>
-  <div>
-    <mat-form-field>
-      <input matInput type="password" placeholder="Pw eingeben" [(ngModel)]="pw" />
-    </mat-form-field>
-  </div>
 
+    <mat-form-field class="example-full-width">
+      <mat-label>Password</mat-label>
+      <input matInput value="" type="password" [(ngModel)]="pw" name="pw" />
+    </mat-form-field>
+  </form>
   <div>
-    <button mat-fab color="primary" [disabled]="checkName()" (click)="login()">Starten</button>
+    <button mat-fab color="primary" [disabled]="checkName()" (click)="login()">
+      Starten
+    </button>
   </div>
-  
+</div>

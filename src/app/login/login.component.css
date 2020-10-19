@@ -1,5 +1,26 @@
-.mat-input-wrapper {
-  max-width: 100px !important;
+.login {
+  position: fixed;
+  left: 50%;
+  top: 100px;
+  /* bring your own prefixes */
+  transform: translate(-50%, 0);
+  font-size: 16px;
+}
+.login button {
+  position: relative;
+  left: 50%;    
+  /* bring your own prefixes */
+  transform: translate(-50%, 0%);
+}
+
+.info {
+  margin-bottom: 15px;
+}
+
+.example-form {
+  min-width: 150px;
+  max-width: 500px;
+  width: 100%;
 }
 
 .example-full-width {

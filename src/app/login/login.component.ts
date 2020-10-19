@@ -16,7 +16,7 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     const token = sessionStorage.getItem("token");
-    if (token) {
+    if (token && token !== "null") {
       this.httpService.token = JSON.parse(token) as TokenData;
       this.httpService.tokenCheck().subscribe((result: any) => {
         if (result.success) {
@@ -26,11 +26,11 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  public checkName() {
+  public checkName(): boolean {
     return !this.name || !this.pw;
   }
 
-  public login() {
+  public login(): void {
     this.httpService.login(this.name, this.pw).subscribe(
       (result: TokenData) => {
         this.httpService.token = result;
@@ -41,11 +41,5 @@ export class LoginComponent implements OnInit {
         const j = err;
       }
     );
-  }
-
-  public logout() {
-    this.httpService.token = null;
-    sessionStorage.setItem("token", null);
-    this.router.navigate(["/login"]);
   }
 }
