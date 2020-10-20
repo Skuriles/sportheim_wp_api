@@ -44,7 +44,7 @@ export class HttpService {
 
   public getAllData() {
     const nodeUrl = this.apiPrefix + "svd_sportheim/v1/getAll";
-    return this.getAuthRequest(nodeUrl);
+    return this.getRequest(nodeUrl);
   }
 
   // default http requests

@@ -147,16 +147,16 @@
       "element",
       "app",
       "kebab-case"
-    ],
-    "linterOptions": {
-      "exclude": [
-        "../node_modules/**/*",
-        "./node_modules/**/*",
-        "node_modules",
-        "node_modules/**/*.ts",
-        "**/node_modules/**/*",
-        "**/node_modules/**"
-      ]
-    }
+    ]
+  },
+  "linterOptions": {
+    "exclude": [
+      "../node_modules/**/*",
+      "./node_modules/**/*",
+      "node_modules",
+      "node_modules/**/*.ts",
+      "**/node_modules/**/*",
+      "**/node_modules/**"
+    ]
   }
 }

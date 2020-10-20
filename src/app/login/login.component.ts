@@ -1,7 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { Router } from "@angular/router";
-import { TokenData } from "../classes/tokenData";
-import { HttpService } from "../services/http.service";
+import { Credentials } from "../classes/credentials";
 
 @Component({
   selector: "app-login",
@@ -9,37 +7,15 @@ import { HttpService } from "../services/http.service";
   styleUrls: ["./login.component.css"],
 })
 export class LoginComponent implements OnInit {
-  public name = "";
-  public pw = "";
+  public credentials: Credentials;
 
-  constructor(private httpService: HttpService, private router: Router) {}
+  constructor() {}
 
   ngOnInit(): void {
-    const token = sessionStorage.getItem("token");
-    if (token && token !== "null") {
-      this.httpService.token = JSON.parse(token) as TokenData;
-      this.httpService.tokenCheck().subscribe((result: any) => {
-        if (result.success) {
-          this.router.navigate(["/main"]);
-        }
-      });
-    }
+    this.credentials = new Credentials();
   }
 
   public checkName(): boolean {
-    return !this.name || !this.pw;
-  }
-
-  public login(): void {
-    this.httpService.login(this.name, this.pw).subscribe(
-      (result: TokenData) => {
-        this.httpService.token = result;
-        sessionStorage.setItem("token", JSON.stringify(result));
-        this.router.navigate(["/main"]);
-      },
-      (err) => {
-        const j = err;
-      }
-    );
+    return !this.credentials.name || !this.credentials.pw;
   }
 }

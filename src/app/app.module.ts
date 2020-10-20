@@ -18,8 +18,9 @@ import { StartComponent } from "./app.component";
 import { LoginComponent } from "./login/login.component";
 import { HttpService } from "./services/http.service";
 import { MainpageComponent } from "./mainpage/mainpage.component";
-import { AuthGuardService } from "./services/auth-guard.service";
 import { EditMatchDayComponent } from "./edit-match-day/edit-match-day.component";
+import { LoginService } from "./services/login.service";
+import { LuxonModule } from "luxon-angular";
 
 @NgModule({
   declarations: [
@@ -41,8 +42,9 @@ import { EditMatchDayComponent } from "./edit-match-day/edit-match-day.component
     MatMenuModule,
     MatFormFieldModule,
     MatDialogModule,
+    LuxonModule,
   ],
-  providers: [HttpService, AuthGuardService],
+  providers: [HttpService, LoginService],
   bootstrap: [StartComponent],
 })
 export class AppModule {}

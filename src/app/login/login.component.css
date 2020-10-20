@@ -1,20 +1,5 @@
-.login {
-  position: fixed;
-  left: 50%;
-  top: 100px;
-  /* bring your own prefixes */
-  transform: translate(-50%, 0);
+ .login {  
   font-size: 16px;
-}
-.login button {
-  position: relative;
-  left: 50%;    
-  /* bring your own prefixes */
-  transform: translate(-50%, 0%);
-}
-
-.info {
-  margin-bottom: 15px;
 }
 
 .example-form {

@@ -35,9 +35,7 @@ function init_database()
 
     $sql = "CREATE TABLE $table_name (
       id mediumint(9) NOT NULL AUTO_INCREMENT,
-      tag text NOT NULL,
-      datum text NOT NULL,
-      uhrzeit text NOT NULL,
+      datum datetime NOT NULL,
       mannschaft text NOT NULL,
       heim text NOT NULL,
       gast text NOT NULL,
@@ -76,21 +74,16 @@ function test_database()
 {
     global $wpdb;
 
-    $welcome_name = 'Mr. WordPress';
-    $welcome_text = 'Congratulations, you just completed the installation!';
-
     $table_name = $wpdb->prefix . svdTable;
-
+    $timestamp = date('m/d/Y h:i:s a');
     $wpdb->insert(
         $table_name,
         array(
-            'tag' => "Mo",
-            'datum' => $welcome_name,
-            'uhrzeit' => $welcome_name,
-            'mannschaft' => $welcome_name,
-            'heim' => $welcome_name,
-            'gast' => $welcome_name,
-            'person' => $welcome_text,
+            'datum' => $timestamp,
+            'mannschaft' => "Herren Bezirksliga",
+            'heim' => "SVD",
+            'gast' => "FC Steißlingen",
+            'person' => "Bene",
         )
     );
 }
