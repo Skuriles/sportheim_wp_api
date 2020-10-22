@@ -10,6 +10,7 @@ export class Spieltag {
   public person: string;
 
   public createFrom(element: Spieltag) {
+    this.id = element.id;
     this.datum = element.datum;
     this.date = DateTime.fromSQL(element.datum).toLocal();
     this.mannschaft = element.mannschaft;

@@ -11,6 +11,7 @@ export class EditMatchDayComponent implements OnInit {
   public spieltag: Spieltag;
   constructor(@Inject(MAT_DIALOG_DATA) public data: Spieltag) {
     this.spieltag = data;
+    this.spieltag.datum = this.spieltag.date.toISO();
   }
 
   ngOnInit(): void {}

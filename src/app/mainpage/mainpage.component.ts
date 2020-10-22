@@ -8,6 +8,7 @@ import { EditMatchDayComponent } from "../edit-match-day/edit-match-day.componen
 import { LoginComponent } from "../login/login.component";
 import { HttpService } from "../services/http.service";
 import { LoginService } from "../services/login.service";
+import { MatSnackBar } from "@angular/material/snack-bar";
 
 @Component({
   selector: "app-mainpage",
@@ -30,7 +31,8 @@ export class MainpageComponent implements OnInit {
   constructor(
     private httpService: HttpService,
     public dialog: MatDialog,
-    public loginService: LoginService
+    public loginService: LoginService,
+    private snackBar: MatSnackBar
   ) {
     Settings.defaultLocale = "de";
   }
@@ -41,9 +43,11 @@ export class MainpageComponent implements OnInit {
       this.displayedColumns.push("edit");
     }
     this.httpService.getAllData().subscribe((result: Spieltag[]) => {
-      this.spiele = result;
-      for (const spiel of this.spiele) {
+      for (const spiel of result) {
         spiel.date = DateTime.fromSQL(spiel.datum);
+        const newGame = new Spieltag();
+        newGame.createFrom(spiel);
+        this.spiele.push(newGame);
       }
       this.spiele.sort((a, b) => this.sortByDate(a.date, b.date));
     });
@@ -79,8 +83,19 @@ export class MainpageComponent implements OnInit {
       data: element,
     });
 
-    dialogRef.afterClosed().subscribe((result) => {
-      console.log(`Dialog result: ${result}`);
+    dialogRef.afterClosed().subscribe((result: Spieltag) => {
+      if (result) {
+        element = result;
+        element.date = DateTime.fromISO(element.datum);
+        element.datum = element.date.toSQL({ includeOffset: false });
+        this.httpService.saveGame(element).subscribe((saved: boolean) => {
+          if (saved) {
+            this.openSnackBar("Gespeichert", "Ok");
+          }
+        });
+      } else {
+        element = this.oldEle;
+      }
     });
 
     this.selectedElement = element;
@@ -136,5 +151,10 @@ export class MainpageComponent implements OnInit {
     }
     // a muss gleich b sein
     return 0;
+  }
+  private openSnackBar(text: string, btnText: string) {
+    this.snackBar.open(text, btnText, {
+      duration: 2000,
+    });
   }
 }

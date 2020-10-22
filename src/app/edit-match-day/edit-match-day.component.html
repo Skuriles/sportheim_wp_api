@@ -1,34 +1,19 @@
 <h2 mat-dialog-title>Spieltag bearbeiten</h2>
 <mat-dialog-content class="mat-typography">
+  <div>
+    Spiel: {{ spieltag.mannschaft }} - {{ spieltag.heim }} : {{ spieltag.gast }}
+  </div>
   <div class="login">
     <form class="example-form">
-      <mat-form-field class="example-full-width">
-        <mat-label>Tag</mat-label>
-        <input
-          matInput
-          placeholder="Tag"
-          [(ngModel)]="spieltag.tag"
-          name="tag"
-        />
-      </mat-form-field>
       <mat-form-field class="example-full-width">
         <mat-label>Datum</mat-label>
         <input
           matInput
-          type="date"
-          placeholder="Datum"
-          [(ngModel)]="spieltag.datum"
-          name="datum"
-        />
-      </mat-form-field>
-      <mat-form-field class="example-full-width">
-        <mat-label>Uhrzeit</mat-label>
-        <input
-          matInput
           type="datetime-local"
-          placeholder="Uhrzeit"
-          [(ngModel)]="spieltag.uhrzeit"
-          name="uhrzeit"
+          placeholder="Datum"
+          [ngModel]="spieltag.date | date: 'yyyy-MM-ddTHH:mm'"
+          (ngModelChange)="spieltag.datum = $event"
+          name="datum"
         />
       </mat-form-field>
       <mat-form-field class="example-full-width">
@@ -45,7 +30,7 @@
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-button mat-dialog-close>Abbrechen</button>
-  <button mat-button [mat-dialog-close]="true" cdkFocusInitial>
+  <button mat-button [mat-dialog-close]="spieltag" cdkFocusInitial>
     Speichern
   </button>
 </mat-dialog-actions>

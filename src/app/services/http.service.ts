@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { TokenData } from "../classes/tokenData";
+import { Spieltag } from "../classes/spieltag";
 
 @Injectable({
   providedIn: "root",
@@ -45,6 +46,12 @@ export class HttpService {
   public getAllData() {
     const nodeUrl = this.apiPrefix + "svd_sportheim/v1/getAll";
     return this.getRequest(nodeUrl);
+  }
+
+  public saveGame(element: Spieltag) {
+    const nodeUrl = this.apiPrefix + "svd_sportheim/v1/saveGame";
+    const body = { element };
+    return this.postRequest(nodeUrl, body);
   }
 
   // default http requests

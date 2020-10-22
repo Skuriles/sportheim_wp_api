@@ -11,7 +11,7 @@
   <ng-container matColumnDef="datum">
     <th mat-header-cell *matHeaderCellDef>Datum</th>
     <td mat-cell *matCellDef="let element">
-      {{ element.date | dateTimeToFormat: "ccc, d. MMMM yyyy" }}
+      {{ element.date | dateTimeToFormat: "ccc, d. MMMM yyyy - HH:mm" }}
     </td>
   </ng-container>
 

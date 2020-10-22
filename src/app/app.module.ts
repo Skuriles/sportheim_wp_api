@@ -10,6 +10,7 @@ import { MatButtonModule } from "@angular/material/button";
 import { MatIconModule } from "@angular/material/icon";
 import { MatTableModule } from "@angular/material/table";
 import { MatMenuModule } from "@angular/material/menu";
+import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatDialogModule } from "@angular/material/dialog";
 
@@ -38,6 +39,7 @@ import { LuxonModule } from "luxon-angular";
     MatButtonModule,
     MatTableModule,
     MatIconModule,
+    MatSnackBarModule,
     HttpClientModule,
     MatMenuModule,
     MatFormFieldModule,

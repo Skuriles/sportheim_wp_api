@@ -9,8 +9,8 @@
  * @return string|null Post title for the latest, * or null if none.
  */
 
-register_activation_hook(__FILE__, 'init_database');
-register_activation_hook(__FILE__, 'test_database');
+register_activation_hook(__FILE__, 'init_svd_api_database');
+register_activation_hook(__FILE__, 'test_svdapi_database');
 
 add_action('rest_api_init', function () {
     register_rest_route('svd_sportheim/v1', '/author/(?P<id>\d+)', array(
@@ -20,13 +20,18 @@ add_action('rest_api_init', function () {
 
     register_rest_route('svd_sportheim/v1', '/getAll', array(
         'methods' => 'GET',
-        'callback' => 'get_all_data',
+        'callback' => 'get_all_svdapi_data',
+    ));
+
+    register_rest_route('svd_sportheim/v1', '/saveGame', array(
+        'methods' => 'POST',
+        'callback' => 'save_svdapi_game',
     ));
 
 });
 
 define("svdTable", 'svd_sportheim');
-function init_database()
+function init_svd_api_database()
 {
     global $wpdb;
     $table_name = $wpdb->prefix . svdTable;
@@ -70,7 +75,7 @@ function init_database()
 //     );
 // }
 
-function test_database()
+function test_svdapi_database()
 {
     global $wpdb;
 
@@ -101,10 +106,28 @@ function my_awesome_func($data)
     return $posts[0]->post_title;
 }
 
-function get_all_data()
+function get_all_svdapi_data()
 {
     global $wpdb;
     $table = $wpdb->prefix . svdTable;
     $result = $wpdb->get_results("SELECT * FROM $table");
     return $result;
+}
+
+function save_svdapi_game(WP_REST_Request $request)
+{
+    //var_dump($request);
+    global $wpdb;
+
+    $table_name = $wpdb->prefix . svdTable;
+    $result = $request->get_json_params();
+    $ele = $result["element"];
+    $wpdb->update( 
+        $table_name, 
+        'datum' => $ele["datum"],   
+        'person' => $ele["person"]  
+    ), 
+    array( 'id' => $ele["id"] )    
+    );    
+    return true;
 }
