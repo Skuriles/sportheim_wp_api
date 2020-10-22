@@ -122,12 +122,12 @@ function save_svdapi_game(WP_REST_Request $request)
     $table_name = $wpdb->prefix . svdTable;
     $result = $request->get_json_params();
     $ele = $result["element"];
-    $wpdb->update( 
-        $table_name, 
-        'datum' => $ele["datum"],   
-        'person' => $ele["person"]  
-    ), 
-    array( 'id' => $ele["id"] )    
-    );    
+    $wpdb->update(
+        $table_name,
+        array(
+            'datum' => $ele["datum"],
+            'person' => $ele["person"],
+        ),
+        array('id' => $ele["id"]));
     return true;
 }
