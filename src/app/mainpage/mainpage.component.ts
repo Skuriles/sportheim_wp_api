@@ -9,6 +9,10 @@ import { LoginComponent } from "../login/login.component";
 import { HttpService } from "../services/http.service";
 import { LoginService } from "../services/login.service";
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatTableDataSource } from "@angular/material/table";
+import { ConfirmBoxComponent } from "../confirm-box/confirm-box.component";
+import { CreateGameComponent } from "../create-game/create-game.component";
+import { UploadCsvComponent } from "../upload-csv/upload-csv.component";
 
 @Component({
   selector: "app-mainpage",
@@ -19,14 +23,8 @@ export class MainpageComponent implements OnInit {
   public spiele: Spieltag[] = [];
   public selectedElement: Spieltag;
   private oldEle: Spieltag;
-
-  public displayedColumns: string[] = [
-    "datum",
-    "mannschaft",
-    "heim",
-    "gast",
-    "person",
-  ];
+  public dataSource: MatTableDataSource<Spieltag>;
+  public displayedColumns: string[] = [];
 
   constructor(
     private httpService: HttpService,
@@ -38,10 +36,24 @@ export class MainpageComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.spiele = [];
+    this.setDisplayColumns();
+    this.checkToken();
     this.resetSelectedEle();
     if (this.loginService.loggedIn) {
-      this.displayedColumns.push("edit");
+      if (this.displayedColumns.length <= 5) {
+        this.displayedColumns.push("edit");
+        this.displayedColumns.push("delete");
+      }
     }
+    this.getAllGames();
+
+    this.httpService.getApiInfo().subscribe((result) => {
+      const i = result;
+    });
+  }
+
+  private getAllGames() {
     this.httpService.getAllData().subscribe((result: Spieltag[]) => {
       for (const spiel of result) {
         spiel.date = DateTime.fromSQL(spiel.datum);
@@ -50,13 +62,8 @@ export class MainpageComponent implements OnInit {
         this.spiele.push(newGame);
       }
       this.spiele.sort((a, b) => this.sortByDate(a.date, b.date));
+      this.dataSource = new MatTableDataSource(this.spiele);
     });
-
-    this.httpService.getApiInfo().subscribe((result) => {
-      const i = result;
-    });
-
-    this.checkToken();
   }
 
   private checkToken() {
@@ -66,7 +73,10 @@ export class MainpageComponent implements OnInit {
       this.httpService.tokenCheck().subscribe((result: any) => {
         if (result.success) {
           this.loginService.loggedIn = true;
-          this.displayedColumns.push("edit");
+          if (this.displayedColumns.length <= 5) {
+            this.displayedColumns.push("edit");
+            this.displayedColumns.push("delete");
+          }
         }
       });
     }
@@ -88,11 +98,7 @@ export class MainpageComponent implements OnInit {
         element = result;
         element.date = DateTime.fromISO(element.datum);
         element.datum = element.date.toSQL({ includeOffset: false });
-        this.httpService.saveGame(element).subscribe((saved: boolean) => {
-          if (saved) {
-            this.openSnackBar("Gespeichert", "Ok");
-          }
-        });
+        this.saveGame(element);
       } else {
         element = this.oldEle;
       }
@@ -101,12 +107,62 @@ export class MainpageComponent implements OnInit {
     this.selectedElement = element;
   }
 
-  public saveSingle(element: Spieltag) {
-    this.resetSelectedEle();
+  public delete(element: Spieltag) {
+    const dialogRef = this.dialog.open(ConfirmBoxComponent, {
+      data: element,
+    });
+
+    dialogRef.afterClosed().subscribe((result: Spieltag) => {
+      if (result) {
+        this.deleteGame(element.id);
+      }
+    });
   }
 
-  public cancelSingle() {
-    this.ngOnInit();
+  public newGame() {
+    const dialogRef = this.dialog.open(CreateGameComponent);
+    dialogRef.afterClosed().subscribe((result: Spieltag) => {
+      if (result) {
+        this.addGame(result);
+      }
+    });
+  }
+
+  public applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
+
+  private saveGame(element: Spieltag) {
+    this.httpService.saveGame(element).subscribe((saved: boolean) => {
+      if (saved) {
+        this.openSnackBar("Gespeichert", "Ok");
+      } else {
+        this.openSnackBar("Speichern fehlgeschlagen", "Ok");
+      }
+    });
+  }
+
+  private addGame(element: Spieltag) {
+    this.httpService.addGame(element).subscribe((saved: boolean) => {
+      if (saved) {
+        this.openSnackBar("Spiel angelegt", "Ok");
+        this.ngOnInit();
+      } else {
+        this.openSnackBar("Speichern fehlgeschlagen", "Ok");
+      }
+    });
+  }
+
+  private deleteGame(id: number) {
+    this.httpService.deleteGame(id).subscribe((saved: boolean) => {
+      if (saved) {
+        this.openSnackBar("Gelöscht", "Ok");
+        this.ngOnInit();
+      } else {
+        this.openSnackBar("Löschen fehlgeschlagen", "Ok");
+      }
+    });
   }
 
   public login() {
@@ -119,6 +175,16 @@ export class MainpageComponent implements OnInit {
     });
   }
 
+  public upload() {
+    const dialogRef = this.dialog.open(UploadCsvComponent);
+
+    dialogRef.afterClosed().subscribe((result: boolean) => {
+      if (result) {
+        this.ngOnInit();
+      }
+    });
+  }
+
   public loginFromDialog(creds: Credentials): void {
     this.httpService.login(creds.name, creds.pw).subscribe(
       (result: TokenData) => {
@@ -126,11 +192,17 @@ export class MainpageComponent implements OnInit {
           this.httpService.token = result;
           sessionStorage.setItem("token", JSON.stringify(result));
           this.loginService.loggedIn = true;
-          this.displayedColumns.push("edit");
+          if (this.displayedColumns.length <= 5) {
+            this.displayedColumns.push("edit");
+            this.displayedColumns.push("delete");
+          }
         }
       },
       (err) => {
-        const j = err;
+        this.openSnackBar(
+          "Fehler beim Einloggen - Bitte PW und Name prüfen",
+          "Verstanden"
+        );
       }
     );
   }
@@ -139,7 +211,9 @@ export class MainpageComponent implements OnInit {
     this.httpService.token = null;
     sessionStorage.setItem("token", null);
     this.loginService.loggedIn = false;
-    this.displayedColumns.splice(this.displayedColumns.length - 1, 1);
+    if (this.displayedColumns.length > 5) {
+      this.displayedColumns.splice(this.displayedColumns.length - 1, 2);
+    }
   }
 
   private sortByDate(a: DateTime, b: DateTime) {
@@ -156,5 +230,9 @@ export class MainpageComponent implements OnInit {
     this.snackBar.open(text, btnText, {
       duration: 2000,
     });
+  }
+
+  private setDisplayColumns() {
+    this.displayedColumns = ["datum", "mannschaft", "heim", "gast", "person"];
   }
 }

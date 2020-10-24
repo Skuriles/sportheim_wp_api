@@ -51,9 +51,24 @@ export class HttpService {
   public saveGame(element: Spieltag) {
     const nodeUrl = this.apiPrefix + "svd_sportheim/v1/saveGame";
     const body = { element };
-    return this.postRequest(nodeUrl, body);
+    return this.postAuthRequest(nodeUrl, body);
   }
 
+  public addGame(element: Spieltag) {
+    const nodeUrl = this.apiPrefix + "svd_sportheim/v1/addGame";
+    const body = { element };
+    return this.postAuthRequest(nodeUrl, body);
+  }
+
+  public deleteGame(id: number) {
+    const nodeUrl = this.apiPrefix + "svd_sportheim/v1/deleteGame/" + id;
+    return this.getAuthRequest(nodeUrl);
+  }
+
+  public uploadCsv(files: File[]) {
+    const nodeUrl = this.apiPrefix + "svd_sportheim/v1/uploadCsv";
+    return this.postAuthUploadRequest(nodeUrl, files);
+  }
   // default http requests
   private postRequest(nodeUrl: string, body: any) {
     return this.http.post(nodeUrl, body);
@@ -66,6 +81,18 @@ export class HttpService {
   private postAuthRequest(nodeUrl: string, body: any) {
     return this.http.post(nodeUrl, body, {
       headers: new HttpHeaders().set("authorization", this.token.data.jwt),
+    });
+  }
+
+  private postAuthUploadRequest(nodeUrl: string, files: File[]) {
+    const formData = new FormData();
+    for (const file of files) {
+      formData.append("file", file);
+    }
+    const header = new HttpHeaders().set("authorization", this.token.data.jwt);
+    header.set("Content-Type", []);
+    return this.http.post(nodeUrl, formData, {
+      headers: header,
     });
   }
 

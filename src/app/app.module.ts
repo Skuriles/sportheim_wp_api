@@ -13,6 +13,7 @@ import { MatMenuModule } from "@angular/material/menu";
 import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatDialogModule } from "@angular/material/dialog";
+import { MatToolbarModule } from "@angular/material/toolbar";
 
 import { StartComponent } from "./app.component";
 
@@ -22,6 +23,9 @@ import { MainpageComponent } from "./mainpage/mainpage.component";
 import { EditMatchDayComponent } from "./edit-match-day/edit-match-day.component";
 import { LoginService } from "./services/login.service";
 import { LuxonModule } from "luxon-angular";
+import { ConfirmBoxComponent } from "./confirm-box/confirm-box.component";
+import { CreateGameComponent } from "./create-game/create-game.component";
+import { UploadCsvComponent } from "./upload-csv/upload-csv.component";
 
 @NgModule({
   declarations: [
@@ -29,6 +33,9 @@ import { LuxonModule } from "luxon-angular";
     LoginComponent,
     MainpageComponent,
     EditMatchDayComponent,
+    ConfirmBoxComponent,
+    CreateGameComponent,
+    UploadCsvComponent,
   ],
   imports: [
     BrowserModule,
@@ -40,6 +47,7 @@ import { LuxonModule } from "luxon-angular";
     MatTableModule,
     MatIconModule,
     MatSnackBarModule,
+    MatToolbarModule,
     HttpClientModule,
     MatMenuModule,
     MatFormFieldModule,

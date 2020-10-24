@@ -1,9 +1,5 @@
-<h2 mat-dialog-title>Spieltag bearbeiten</h2>
+<h2 mat-dialog-title>Spieltag erstellen</h2>
 <mat-dialog-content class="mat-typography">
-  <div>
-    Spiel: {{ spieltag.mannschaft }} - {{ spieltag.heim }} :
-    {{ spieltag.gast }}
-  </div>
   <div class="login">
     <form class="example-form">
       <mat-form-field class="example-full-width">
@@ -15,6 +11,33 @@
           [ngModel]="spieltag.date | date: 'yyyy-MM-ddTHH:mm'"
           (ngModelChange)="spieltag.datum = $event"
           name="datum"
+        />
+      </mat-form-field>
+      <mat-form-field class="example-full-width">
+        <mat-label>Mannschaft</mat-label>
+        <input
+          matInput
+          placeholder="Mannschaft und Staffel"
+          [(ngModel)]="spieltag.mannschaft"
+          name="mannschaft"
+        />
+      </mat-form-field>
+      <mat-form-field class="example-full-width">
+        <mat-label>Heim</mat-label>
+        <input
+          matInput
+          placeholder="Heim"
+          [(ngModel)]="spieltag.heim"
+          name="heim"
+        />
+      </mat-form-field>
+      <mat-form-field class="example-full-width">
+        <mat-label>Gast</mat-label>
+        <input
+          matInput
+          placeholder="Gast"
+          [(ngModel)]="spieltag.gast"
+          name="gast"
         />
       </mat-form-field>
       <mat-form-field class="example-full-width">

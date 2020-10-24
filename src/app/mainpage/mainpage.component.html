@@ -1,13 +1,50 @@
-<button mat-button (click)="login()" *ngIf="!loginService.loggedIn">
-  Bearbeiten
-</button>
-<button mat-button (click)="logout()" *ngIf="loginService.loggedIn">
-  Ausloggen
-</button>
-<button mat-button (click)="ngOnInit()" *ngIf="loginService.loggedIn">
-  Verwerfen
-</button>
-<table mat-table [dataSource]="spiele" class="mat-elevation-z8">
+<div class="example-button-row">
+  <button
+    mat-raised-button
+    (click)="login()"
+    *ngIf="!loginService.loggedIn"
+    color="primary"
+  >
+    Bearbeiten
+  </button>
+  <button
+    mat-stroked-button
+    (click)="logout()"
+    *ngIf="loginService.loggedIn"
+    color="primary"
+  >
+    Ausloggen
+  </button>
+  <button
+    mat-stroked-button
+    (click)="upload()"
+    *ngIf="loginService.loggedIn"
+    color="primary"
+  >
+    Upload
+  </button>
+  <button
+    mat-mini-fab
+    color="primary"
+    (click)="newGame()"
+    *ngIf="loginService.loggedIn"
+    class="addbtn"
+  >
+    <mat-icon>add</mat-icon>
+  </button>
+</div>
+<div class="filter">
+  <mat-form-field>
+    <mat-label>Filter</mat-label>
+    <input
+      matInput
+      (keyup)="applyFilter($event)"
+      placeholder="Suche - Datum mit 2020-10-24 Format"
+      #input
+    />
+  </mat-form-field>
+</div>
+<table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
   <ng-container matColumnDef="datum">
     <th mat-header-cell *matHeaderCellDef>Datum</th>
     <td mat-cell *matCellDef="let element">
@@ -45,6 +82,20 @@
         aria-label="Edit Icon"
         (click)="edit(element)"
         >edit</mat-icon
+      >
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="delete">
+    <th mat-header-cell *matHeaderCellDef>
+      <mat-icon aria-hidden="false" aria-label="delete Icon">delete</mat-icon>
+    </th>
+    <td mat-cell *matCellDef="let element">
+      <mat-icon
+        aria-hidden="false"
+        aria-label="delete Icon"
+        (click)="delete(element)"
+        >delete</mat-icon
       >
     </td>
   </ng-container>

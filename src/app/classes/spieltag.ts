@@ -14,7 +14,7 @@ export class Spieltag {
     this.datum = element.datum;
     this.date = DateTime.fromSQL(element.datum).toLocal();
     this.mannschaft = element.mannschaft;
-    this.heim = element.person;
+    this.heim = element.heim;
     this.gast = element.gast;
     this.person = element.person;
   }
