@@ -4,3 +4,10 @@
 [1024/064035.789:ERROR:directory_reader_win.cc(43)] FindFirstFile: Das System kann den angegebenen Pfad nicht finden. (0x3)
 [1024/065911.395:ERROR:directory_reader_win.cc(43)] FindFirstFile: Das System kann den angegebenen Pfad nicht finden. (0x3)
 [1024/113654.225:ERROR:directory_reader_win.cc(43)] FindFirstFile: Das System kann den angegebenen Pfad nicht finden. (0x3)
+[1026/033827.377:ERROR:crash_report_database_win.cc(498)] failed to stat report
+[1026/033827.378:ERROR:crash_report_database_win.cc(498)] failed to stat report
+[1026/034827.379:ERROR:crash_report_database_win.cc(498)] failed to stat report
+[1026/034827.379:ERROR:crash_report_database_win.cc(498)] failed to stat report
+[1026/034827.379:ERROR:filesystem_win.cc(116)] GetFileAttributes C:\Users\Bene\AppData\Local\Temp\.profile\Crashpad\reports\0e957670-fbbe-4792-b5a3-6d509a31ab55.dmp: Das System kann die angegebene Datei nicht finden. (0x2)
+[1026/034827.379:ERROR:filesystem_win.cc(116)] GetFileAttributes C:\Users\Bene\AppData\Local\Temp\.profile\Crashpad\reports\3289142b-7a58-4ed4-b5d4-3fda6e3cbae5.dmp: Das System kann die angegebene Datei nicht finden. (0x2)
+[1026/034827.379:ERROR:directory_reader_win.cc(43)] FindFirstFile: Das System kann den angegebenen Pfad nicht finden. (0x3)

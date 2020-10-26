@@ -10,9 +10,9 @@ export class HttpService {
   constructor(private http: HttpClient) {}
 
   public token: TokenData;
-  private baseUrl = "http://localhost:65004/wptest_master/";
+  // private baseUrl = "http://localhost:65004/wptest_master/";
+  private baseUrl = "https://sv-deggenhausertal.de/";
   private apiPrefix = this.baseUrl + "wp-json/";
-  // private baseUrl = "http://sportheim.sv-deggenhausertal.de/";
 
   public getApiInfo() {
     const nodeUrl = this.apiPrefix;
@@ -25,7 +25,7 @@ export class HttpService {
   }
 
   public login(userName: string, pw: string) {
-    const nodeUrl = // http://localhost:65004/wptest_master/?rest_route=/admin/auth&username=test&password=test
+    const nodeUrl =
       this.baseUrl +
       "?rest_route=/admin/auth&username=" +
       userName +
@@ -62,7 +62,7 @@ export class HttpService {
 
   public deleteGame(id: number) {
     const nodeUrl = this.apiPrefix + "svd_sportheim/v1/deleteGame/" + id;
-    return this.getAuthRequest(nodeUrl);
+    return this.postAuthRequest(nodeUrl, null);
   }
 
   public uploadCsv(files: File[]) {

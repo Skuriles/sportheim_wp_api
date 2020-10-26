@@ -8,6 +8,8 @@ export class Spieltag {
   public heim: string;
   public gast: string;
   public person: string;
+  public weekEndRow: boolean;
+  public weekEndText: string;
 
   public createFrom(element: Spieltag) {
     this.id = element.id;
@@ -17,5 +19,7 @@ export class Spieltag {
     this.heim = element.heim;
     this.gast = element.gast;
     this.person = element.person;
+    this.weekEndRow = element.weekEndRow;
+    this.weekEndText = element.weekEndText;
   }
 }

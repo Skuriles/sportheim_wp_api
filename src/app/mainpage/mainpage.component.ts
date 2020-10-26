@@ -21,8 +21,7 @@ import { UploadCsvComponent } from "../upload-csv/upload-csv.component";
 })
 export class MainpageComponent implements OnInit {
   public spiele: Spieltag[] = [];
-  public selectedElement: Spieltag;
-  private oldEle: Spieltag;
+  private editEle: Spieltag;
   public dataSource: MatTableDataSource<Spieltag>;
   public displayedColumns: string[] = [];
 
@@ -36,10 +35,8 @@ export class MainpageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.spiele = [];
     this.setDisplayColumns();
     this.checkToken();
-    this.resetSelectedEle();
     if (this.loginService.loggedIn) {
       if (this.displayedColumns.length <= 5) {
         this.displayedColumns.push("edit");
@@ -54,16 +51,45 @@ export class MainpageComponent implements OnInit {
   }
 
   private getAllGames() {
+    this.spiele = [];
     this.httpService.getAllData().subscribe((result: Spieltag[]) => {
+      // set date and sort
       for (const spiel of result) {
         spiel.date = DateTime.fromSQL(spiel.datum);
+      }
+      result.sort((a, b) => this.sortByDate(a.date, b.date));
+      // loop again to set correct weekend
+      for (const spiel of result) {
+        this.checkWeekDay(spiel);
         const newGame = new Spieltag();
         newGame.createFrom(spiel);
         this.spiele.push(newGame);
       }
-      this.spiele.sort((a, b) => this.sortByDate(a.date, b.date));
       this.dataSource = new MatTableDataSource(this.spiele);
     });
+  }
+
+  private checkWeekDay(spiel: Spieltag) {
+    if (!this.spiele || this.spiele.length === 0) {
+      this.spiele.push(this.createWeekEndGame(spiel.date));
+      return;
+    }
+    if (this.spiele[this.spiele.length - 1].weekEndRow) {
+      return;
+    }
+    if (
+      spiel.date.weekNumber !==
+      this.spiele[this.spiele.length - 1].date.weekNumber
+    ) {
+      this.spiele.push(this.createWeekEndGame(spiel.date));
+    }
+  }
+
+  private createWeekEndGame(date: DateTime): Spieltag {
+    const newGame = new Spieltag();
+    newGame.weekEndRow = true;
+    newGame.weekEndText = "KW " + date.weekNumber;
+    return newGame;
   }
 
   private checkToken() {
@@ -81,16 +107,12 @@ export class MainpageComponent implements OnInit {
       });
     }
   }
-  private resetSelectedEle() {
-    this.selectedElement = new Spieltag();
-    this.selectedElement.id = 0;
-  }
 
   public edit(element: Spieltag) {
-    this.oldEle = new Spieltag();
-    this.oldEle.createFrom(element);
+    this.editEle = new Spieltag();
+    this.editEle.createFrom(element);
     const dialogRef = this.dialog.open(EditMatchDayComponent, {
-      data: element,
+      data: this.editEle,
     });
 
     dialogRef.afterClosed().subscribe((result: Spieltag) => {
@@ -100,11 +122,9 @@ export class MainpageComponent implements OnInit {
         element.datum = element.date.toSQL({ includeOffset: false });
         this.saveGame(element);
       } else {
-        element = this.oldEle;
+        // nothing to do
       }
     });
-
-    this.selectedElement = element;
   }
 
   public delete(element: Spieltag) {
@@ -134,35 +154,51 @@ export class MainpageComponent implements OnInit {
   }
 
   private saveGame(element: Spieltag) {
-    this.httpService.saveGame(element).subscribe((saved: boolean) => {
-      if (saved) {
-        this.openSnackBar("Gespeichert", "Ok");
-      } else {
-        this.openSnackBar("Speichern fehlgeschlagen", "Ok");
+    this.httpService.saveGame(element).subscribe(
+      (saved: boolean) => {
+        if (saved) {
+          this.openSnackBar("Gespeichert", "Ok");
+          this.getAllGames();
+        } else {
+          this.openSnackBar("Speichern fehlgeschlagen", "Ok", "errorSnack");
+        }
+      },
+      (err) => {
+        this.openSnackBar("Speichern fehlgeschlagen", "Ok", "errorSnack");
       }
-    });
+    );
   }
 
   private addGame(element: Spieltag) {
-    this.httpService.addGame(element).subscribe((saved: boolean) => {
-      if (saved) {
-        this.openSnackBar("Spiel angelegt", "Ok");
-        this.ngOnInit();
-      } else {
-        this.openSnackBar("Speichern fehlgeschlagen", "Ok");
+    this.httpService.addGame(element).subscribe(
+      (saved: boolean) => {
+        if (saved) {
+          this.openSnackBar("Spiel angelegt", "Ok");
+          this.getAllGames();
+        } else {
+          this.openSnackBar("Speichern fehlgeschlagen", "Ok", "errorSnack");
+        }
+      },
+      (err) => {
+        this.openSnackBar("Speichern fehlgeschlagen", "Ok", "errorSnack");
       }
-    });
+    );
   }
 
   private deleteGame(id: number) {
-    this.httpService.deleteGame(id).subscribe((saved: boolean) => {
-      if (saved) {
-        this.openSnackBar("Gelöscht", "Ok");
-        this.ngOnInit();
-      } else {
-        this.openSnackBar("Löschen fehlgeschlagen", "Ok");
+    this.httpService.deleteGame(id).subscribe(
+      (saved: boolean) => {
+        if (saved) {
+          this.openSnackBar("Gelöscht", "Ok");
+          this.getAllGames();
+        } else {
+          this.openSnackBar("Löschen fehlgeschlagen", "Ok", "errorSnack");
+        }
+      },
+      (err) => {
+        this.openSnackBar("Löschen fehlgeschlagen", "Ok", "errorSnack");
       }
-    });
+    );
   }
 
   public login() {
@@ -201,7 +237,8 @@ export class MainpageComponent implements OnInit {
       (err) => {
         this.openSnackBar(
           "Fehler beim Einloggen - Bitte PW und Name prüfen",
-          "Verstanden"
+          "Verstanden",
+          "errorSnack"
         );
       }
     );
@@ -226,9 +263,10 @@ export class MainpageComponent implements OnInit {
     // a muss gleich b sein
     return 0;
   }
-  private openSnackBar(text: string, btnText: string) {
+  private openSnackBar(text: string, btnText: string, cssClass: string = "") {
     this.snackBar.open(text, btnText, {
-      duration: 2000,
+      duration: 3000,
+      panelClass: cssClass,
     });
   }
 

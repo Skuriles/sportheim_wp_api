@@ -13,10 +13,6 @@ register_activation_hook(__FILE__, 'init_svd_api_database');
 // register_activation_hook(__FILE__, 'test_svdapi_database');
 
 add_action('rest_api_init', function () {
-    register_rest_route('svd_sportheim/v1', '/author/(?P<id>\d+)', array(
-        'methods' => 'GET',
-        'callback' => 'my_awesome_func',
-    ));
 
     register_rest_route('svd_sportheim/v1', '/getAll', array(
         'methods' => 'GET',
@@ -34,7 +30,7 @@ add_action('rest_api_init', function () {
     ));
 
     register_rest_route('svd_sportheim/v1', '/deleteGame/(?P<id>\d+)', array(
-        'methods' => 'GET',
+        'methods' => 'POST',
         'callback' => 'remove_svdapi_game',
     ));
 
@@ -45,6 +41,7 @@ add_action('rest_api_init', function () {
 });
 
 define("svdTable", 'svd_sportheim');
+
 function init_svd_api_database()
 {
     global $wpdb;
@@ -66,60 +63,6 @@ function init_svd_api_database()
     dbDelta($sql);
 }
 
-// function update_database()
-// {
-//     global $wpdb;
-
-//     $welcome_name = 'Mr. WordPress';
-//     $welcome_text = 'Congratulations, you just completed the installation!';
-
-//     $table_name = $wpdb->prefix . 'svd_sportheim';
-
-//     $wpdb->insert(
-//         $table_name,
-//         array(
-//             'tag' => "Mo",
-//             'datum' => $welcome_name,
-//             'uhrzeit' => $welcome_name,
-//             'mannschaft' => $welcome_name,
-//             'heim' => $welcome_name,
-//             'gast' => $welcome_name,
-//             'person' => $welcome_text,
-//         )
-//     );
-// }
-
-function test_svdapi_database()
-{
-    global $wpdb;
-
-    $table_name = $wpdb->prefix . svdTable;
-    $timestamp = date('m/d/Y h:i:s a');
-    $wpdb->insert(
-        $table_name,
-        array(
-            'datum' => $timestamp,
-            'mannschaft' => "Herren Bezirksliga",
-            'heim' => "SVD",
-            'gast' => "FC Steißlingen",
-            'person' => "Bene",
-        )
-    );
-}
-
-function my_awesome_func($data)
-{
-    $posts = get_posts(array(
-        'author' => $data['id'],
-    ));
-
-    if (empty($posts)) {
-        return null;
-    }
-
-    return $posts[0]->post_title;
-}
-
 function get_all_svdapi_data()
 {
     global $wpdb;
@@ -129,17 +72,19 @@ function get_all_svdapi_data()
 }
 
 function save_svdapi_game(WP_REST_Request $request)
-{ //var_dump($request);
+{
     global $wpdb;
 
     $table_name = $wpdb->prefix . svdTable;
     $result = $request->get_json_params();
     $ele = $result["element"];
+    $date = sanitize_text_field($ele["datum"]);
+    $person = sanitize_text_field($ele["person"]);
     $result = $wpdb->update(
         $table_name,
         array(
-            'datum' => $ele["datum"],
-            'person' => $ele["person"],
+            'datum' => $date,
+            'person' => $person,
         ),
         array('id' => $ele["id"]));
     return $result;
@@ -152,14 +97,19 @@ function insert_svdapi_game(WP_REST_Request $request)
     $table_name = $wpdb->prefix . svdTable;
     $result = $request->get_json_params();
     $ele = $result["element"];
+    $date = sanitize_text_field($ele["datum"]);
+    $mannschaft = sanitize_text_field($ele["person"]);
+    $heim = sanitize_text_field($ele["person"]);
+    $gast = sanitize_text_field($ele["person"]);
+    $person = sanitize_text_field($ele["person"]);
     $result = $wpdb->insert(
         $table_name,
         array(
-            'datum' => $ele["datum"],
-            'mannschaft' => $ele["mannschaft"],
-            'heim' => $ele["heim"],
-            'gast' => $ele["gast"],
-            'person' => $ele["person"],
+            'datum' => $date,
+            'mannschaft' => $mannschaft,
+            'heim' => $heim,
+            'gast' => $gast,
+            'person' => $person,
         )
     );
     return $result;
@@ -180,25 +130,6 @@ function remove_svdapi_game($data)
 
 function import_svdapi_game(WP_REST_Request $request)
 {
-    // global $wpdb;
-
-    // $table_name = $wpdb->prefix . svdTable;
-    // $result = $request->get_json_params();
-    // $ele = $result["element"];
-    // $result = $wpdb->insert(
-    //     $table_name,
-    //     array(
-    //         'datum' => $ele["datum"],
-    //         'mannschaft' => $ele["mannschaft"],
-    //         'heim' => $ele["heim"],
-    //         'gast' => $ele["gast"],
-    //         'person' => $ele["person"],
-    //     )
-    // );
-    // return $result;
-
-    // if you sent any parameters along with the request, you can access them like so:
-    // $myParam = $request->get_param('my_param');
 
     $permittedExtension = 'csv';
     $permittedTypes = ['text/csv', 'text/plain', "application/octet-stream"];
