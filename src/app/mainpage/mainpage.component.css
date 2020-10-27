@@ -42,3 +42,8 @@ td.mat-footer-cell:last-of-type {
 .weekRow {
     background-color: rgba(0, 0, 0, .12);
 }
+
+.infoIcon {
+    float: right;
+    margin-right: 15px;
+}

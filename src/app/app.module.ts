@@ -14,6 +14,7 @@ import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatDialogModule } from "@angular/material/dialog";
 import { MatToolbarModule } from "@angular/material/toolbar";
+import { LayoutModule } from "@angular/cdk/layout";
 
 import { StartComponent } from "./app.component";
 
@@ -26,6 +27,7 @@ import { LuxonModule } from "luxon-angular";
 import { ConfirmBoxComponent } from "./confirm-box/confirm-box.component";
 import { CreateGameComponent } from "./create-game/create-game.component";
 import { UploadCsvComponent } from "./upload-csv/upload-csv.component";
+import { InfoGameComponent } from "./info-game/info-game.component";
 
 @NgModule({
   declarations: [
@@ -36,9 +38,11 @@ import { UploadCsvComponent } from "./upload-csv/upload-csv.component";
     ConfirmBoxComponent,
     CreateGameComponent,
     UploadCsvComponent,
+    InfoGameComponent,
   ],
   imports: [
     BrowserModule,
+    LayoutModule,
     FormsModule,
     NoopAnimationsModule,
     AppRoutingModule,

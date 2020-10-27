@@ -13,6 +13,8 @@ import { MatTableDataSource } from "@angular/material/table";
 import { ConfirmBoxComponent } from "../confirm-box/confirm-box.component";
 import { CreateGameComponent } from "../create-game/create-game.component";
 import { UploadCsvComponent } from "../upload-csv/upload-csv.component";
+import { BreakpointObserver, Breakpoints } from "@angular/cdk/layout";
+import { InfoGameComponent } from "../info-game/info-game.component";
 
 @Component({
   selector: "app-mainpage",
@@ -24,25 +26,31 @@ export class MainpageComponent implements OnInit {
   private editEle: Spieltag;
   public dataSource: MatTableDataSource<Spieltag>;
   public displayedColumns: string[] = [];
+  public isMobileScreen: boolean;
 
   constructor(
     private httpService: HttpService,
     public dialog: MatDialog,
     public loginService: LoginService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private breakpointObserver: BreakpointObserver
   ) {
     Settings.defaultLocale = "de";
+    breakpointObserver
+      .observe([Breakpoints.HandsetLandscape, Breakpoints.HandsetPortrait])
+      .subscribe((result) => {
+        if (result.matches) {
+          this.isMobileScreen = true;
+        } else {
+          this.isMobileScreen = false;
+        }
+        this.setDisplayColumns(this.isMobileScreen);
+      });
   }
 
   ngOnInit(): void {
-    this.setDisplayColumns();
     this.checkToken();
-    if (this.loginService.loggedIn) {
-      if (this.displayedColumns.length <= 5) {
-        this.displayedColumns.push("edit");
-        this.displayedColumns.push("delete");
-      }
-    }
+    this.setDisplayColumns(this.isMobileScreen);
     this.getAllGames();
 
     this.httpService.getApiInfo().subscribe((result) => {
@@ -99,10 +107,7 @@ export class MainpageComponent implements OnInit {
       this.httpService.tokenCheck().subscribe((result: any) => {
         if (result.success) {
           this.loginService.loggedIn = true;
-          if (this.displayedColumns.length <= 5) {
-            this.displayedColumns.push("edit");
-            this.displayedColumns.push("delete");
-          }
+          this.setDisplayColumns(this.isMobileScreen);
         }
       });
     }
@@ -124,6 +129,12 @@ export class MainpageComponent implements OnInit {
       } else {
         // nothing to do
       }
+    });
+  }
+
+  public showInfo(element: Spieltag) {
+    const dialogRef = this.dialog.open(InfoGameComponent, {
+      data: element,
     });
   }
 
@@ -228,10 +239,7 @@ export class MainpageComponent implements OnInit {
           this.httpService.token = result;
           sessionStorage.setItem("token", JSON.stringify(result));
           this.loginService.loggedIn = true;
-          if (this.displayedColumns.length <= 5) {
-            this.displayedColumns.push("edit");
-            this.displayedColumns.push("delete");
-          }
+          this.setDisplayColumns(this.isMobileScreen);
         }
       },
       (err) => {
@@ -248,9 +256,7 @@ export class MainpageComponent implements OnInit {
     this.httpService.token = null;
     sessionStorage.setItem("token", null);
     this.loginService.loggedIn = false;
-    if (this.displayedColumns.length > 5) {
-      this.displayedColumns.splice(this.displayedColumns.length - 1, 2);
-    }
+    this.setDisplayColumns(this.isMobileScreen);
   }
 
   private sortByDate(a: DateTime, b: DateTime) {
@@ -270,7 +276,15 @@ export class MainpageComponent implements OnInit {
     });
   }
 
-  private setDisplayColumns() {
-    this.displayedColumns = ["datum", "mannschaft", "heim", "gast", "person"];
+  private setDisplayColumns(isMobile: boolean) {
+    if (isMobile) {
+      this.displayedColumns = ["datum", "mannschaft", "person"];
+    } else {
+      this.displayedColumns = ["datum", "mannschaft", "heim", "gast", "person"];
+    }
+    if (this.loginService.loggedIn) {
+      this.displayedColumns.push("edit");
+      this.displayedColumns.push("delete");
+    }
   }
 }
