@@ -10,6 +10,7 @@ export class Spieltag {
   public person: string;
   public weekEndRow: boolean;
   public weekEndText: string;
+  public mannschaftShort: string;
 
   public createFrom(element: Spieltag) {
     this.id = element.id;
@@ -21,5 +22,11 @@ export class Spieltag {
     this.person = element.person;
     this.weekEndRow = element.weekEndRow;
     this.weekEndText = element.weekEndText;
+    this.mannschaftShort = this.createShortStr(element.mannschaft);
+  }
+
+  public createShortStr(mannschaft: string): string {
+    const tokens = mannschaft.split("-");
+    return tokens[0];
   }
 }

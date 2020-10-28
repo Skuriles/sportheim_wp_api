@@ -23,10 +23,12 @@ import { InfoGameComponent } from "../info-game/info-game.component";
 })
 export class MainpageComponent implements OnInit {
   public spiele: Spieltag[] = [];
+  public allGames: Spieltag[] = [];
   private editEle: Spieltag;
   public dataSource: MatTableDataSource<Spieltag>;
   public displayedColumns: string[] = [];
   public isMobileScreen: boolean;
+  public showOldDates: boolean;
 
   constructor(
     private httpService: HttpService,
@@ -36,23 +38,21 @@ export class MainpageComponent implements OnInit {
     private breakpointObserver: BreakpointObserver
   ) {
     Settings.defaultLocale = "de";
-    breakpointObserver
-      .observe([Breakpoints.HandsetLandscape, Breakpoints.HandsetPortrait])
-      .subscribe((result) => {
-        if (result.matches) {
-          this.isMobileScreen = true;
-        } else {
-          this.isMobileScreen = false;
-        }
-        this.setDisplayColumns(this.isMobileScreen);
-      });
+    breakpointObserver.observe([Breakpoints.Handset]).subscribe((result) => {
+      if (result.matches) {
+        this.isMobileScreen = true;
+      } else {
+        this.isMobileScreen = false;
+      }
+      this.setDisplayColumns(this.isMobileScreen);
+    });
   }
 
   ngOnInit(): void {
+    this.showOldDates = false;
     this.checkToken();
     this.setDisplayColumns(this.isMobileScreen);
     this.getAllGames();
-
     this.httpService.getApiInfo().subscribe((result) => {
       const i = result;
     });
@@ -60,6 +60,7 @@ export class MainpageComponent implements OnInit {
 
   private getAllGames() {
     this.spiele = [];
+    this.allGames = [];
     this.httpService.getAllData().subscribe((result: Spieltag[]) => {
       // set date and sort
       for (const spiel of result) {
@@ -71,8 +72,10 @@ export class MainpageComponent implements OnInit {
         this.checkWeekDay(spiel);
         const newGame = new Spieltag();
         newGame.createFrom(spiel);
+        this.allGames.push(newGame);
         this.spiele.push(newGame);
       }
+      this.filterGamesByDate();
       this.dataSource = new MatTableDataSource(this.spiele);
     });
   }
@@ -111,6 +114,26 @@ export class MainpageComponent implements OnInit {
         }
       });
     }
+  }
+
+  public toggleDate() {
+    this.showOldDates = !this.showOldDates;
+    this.filterGamesByDate();
+  }
+
+  private filterGamesByDate() {
+    this.spiele = [];
+    for (const game of this.allGames) {
+      this.checkWeekDay(game);
+      const newGame = new Spieltag();
+      newGame.createFrom(game);
+      if (!this.showOldDates && !this.checkTodayDate(game.date)) {
+        continue;
+      } else {
+        this.spiele.push(newGame);
+      }
+    }
+    this.dataSource = new MatTableDataSource(this.spiele);
   }
 
   public edit(element: Spieltag) {
@@ -162,6 +185,10 @@ export class MainpageComponent implements OnInit {
   public applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
+
+  public checkTodayDate(date: DateTime) {
+    return date.valueOf() > DateTime.local().valueOf();
   }
 
   private saveGame(element: Spieltag) {
@@ -276,7 +303,7 @@ export class MainpageComponent implements OnInit {
     });
   }
 
-  private setDisplayColumns(isMobile: boolean) {
+  public setDisplayColumns(isMobile: boolean) {
     if (isMobile) {
       this.displayedColumns = ["datum", "mannschaft", "person"];
     } else {
