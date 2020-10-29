@@ -110,6 +110,11 @@ export class MainpageComponent implements OnInit {
       this.httpService.tokenCheck().subscribe((result: any) => {
         if (result.success) {
           this.loginService.loggedIn = true;
+          this.httpService
+            .getUserRole(result.data.user.ID)
+            .subscribe((info: string[]) => {
+              this.loginService.setRoles(info);
+            });
           this.setDisplayColumns(this.isMobileScreen);
         }
       });

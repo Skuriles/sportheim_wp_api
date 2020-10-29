@@ -38,9 +38,20 @@ add_action('rest_api_init', function () {
         'methods' => 'POST',
         'callback' => 'import_svdapi_game',
     ));
+
+    register_rest_route('svd_sportheim/v1', '/userInfo/(?P<id>\d+)', array(
+        'methods' => 'POST',
+        'callback' => 'get_user_roles_by_user_id',
+    ));
 });
 
 define("svdTable", 'svd_sportheim');
+
+function get_user_roles_by_user_id($data)
+{
+    $user = get_userdata($data["id"]);
+    return empty($user) ? array() : $user->roles;
+}
 
 function init_svd_api_database()
 {
