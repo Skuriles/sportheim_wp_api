@@ -13,9 +13,7 @@
   </button>
   <button
     mat-raised-button
-    (click)="
-      isMobileScreen = !isMobileScreen; setDisplayColumns(isMobileScreen)
-    "
+    (click)="isMobileScreen = !isMobileScreen; setGui(isMobileScreen)"
     color="basic"
   >
     <span *ngIf="!isMobileScreen">Mobile Ansicht</span>
@@ -32,7 +30,7 @@
   <button
     mat-stroked-button
     (click)="upload()"
-    *ngIf="loginService.loggedIn"
+    *ngIf="loginService.loggedIn && adminBtn"
     color="primary"
   >
     Upload
@@ -41,7 +39,7 @@
     mat-mini-fab
     color="primary"
     (click)="newGame()"
-    *ngIf="loginService.loggedIn"
+    *ngIf="loginService.loggedIn && adminBtn"
     class="addbtn"
   >
     <mat-icon>add</mat-icon>

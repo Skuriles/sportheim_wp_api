@@ -15,6 +15,8 @@ import { CreateGameComponent } from "../create-game/create-game.component";
 import { UploadCsvComponent } from "../upload-csv/upload-csv.component";
 import { BreakpointObserver, Breakpoints } from "@angular/cdk/layout";
 import { InfoGameComponent } from "../info-game/info-game.component";
+import { ERoles } from "../enum/roles";
+import { TranslationWidth } from "@angular/common";
 
 @Component({
   selector: "app-mainpage",
@@ -29,6 +31,7 @@ export class MainpageComponent implements OnInit {
   public displayedColumns: string[] = [];
   public isMobileScreen: boolean;
   public showOldDates: boolean;
+  public adminBtn: boolean;
 
   constructor(
     private httpService: HttpService,
@@ -44,14 +47,14 @@ export class MainpageComponent implements OnInit {
       } else {
         this.isMobileScreen = false;
       }
-      this.setDisplayColumns(this.isMobileScreen);
+      this.setGui(this.isMobileScreen);
     });
   }
 
   ngOnInit(): void {
     this.showOldDates = false;
     this.checkToken();
-    this.setDisplayColumns(this.isMobileScreen);
+    this.setGui(this.isMobileScreen);
     this.getAllGames();
     this.httpService.getApiInfo().subscribe((result) => {
       const i = result;
@@ -101,24 +104,6 @@ export class MainpageComponent implements OnInit {
     newGame.weekEndRow = true;
     newGame.weekEndText = "KW " + date.weekNumber;
     return newGame;
-  }
-
-  private checkToken() {
-    const token = sessionStorage.getItem("token");
-    if (token && token !== "null") {
-      this.httpService.token = JSON.parse(token) as TokenData;
-      this.httpService.tokenCheck().subscribe((result: any) => {
-        if (result.success) {
-          this.loginService.loggedIn = true;
-          this.httpService
-            .getUserRole(result.data.user.ID)
-            .subscribe((info: string[]) => {
-              this.loginService.setRoles(info);
-            });
-          this.setDisplayColumns(this.isMobileScreen);
-        }
-      });
-    }
   }
 
   public toggleDate() {
@@ -271,7 +256,16 @@ export class MainpageComponent implements OnInit {
           this.httpService.token = result;
           sessionStorage.setItem("token", JSON.stringify(result));
           this.loginService.loggedIn = true;
-          this.setDisplayColumns(this.isMobileScreen);
+          this.httpService.tokenCheck().subscribe((checkResult: any) => {
+            if (checkResult.success) {
+              this.httpService
+                .getUserRole(checkResult.data.user.ID)
+                .subscribe((info: string[]) => {
+                  this.loginService.setRoles(info);
+                });
+              this.setGui(this.isMobileScreen);
+            }
+          });
         }
       },
       (err) => {
@@ -284,11 +278,29 @@ export class MainpageComponent implements OnInit {
     );
   }
 
+  private checkToken() {
+    const token = sessionStorage.getItem("token");
+    if (token && token !== "null") {
+      this.httpService.token = JSON.parse(token) as TokenData;
+      this.httpService.tokenCheck().subscribe((result: any) => {
+        if (result.success) {
+          this.loginService.loggedIn = true;
+          this.httpService
+            .getUserRole(result.data.user.ID)
+            .subscribe((info: string[]) => {
+              this.loginService.setRoles(info);
+            });
+          this.setGui(this.isMobileScreen);
+        }
+      });
+    }
+  }
+
   public logout(): void {
     this.httpService.token = null;
     sessionStorage.setItem("token", null);
     this.loginService.loggedIn = false;
-    this.setDisplayColumns(this.isMobileScreen);
+    this.setGui(this.isMobileScreen);
   }
 
   private sortByDate(a: DateTime, b: DateTime) {
@@ -308,7 +320,7 @@ export class MainpageComponent implements OnInit {
     });
   }
 
-  public setDisplayColumns(isMobile: boolean) {
+  public setGui(isMobile: boolean) {
     if (isMobile) {
       this.displayedColumns = ["datum", "mannschaft", "person"];
     } else {
@@ -318,5 +330,20 @@ export class MainpageComponent implements OnInit {
       this.displayedColumns.push("edit");
       this.displayedColumns.push("delete");
     }
+    if (this.loginService.loggedIn) {
+      if (this.loginService.userRole > ERoles.subscriber) {
+        setTimeout(() => {
+          this.adminBtn = true;
+        }, 1);
+        return;
+      }
+      if (this.loginService.userRole > ERoles.loggedOff) {
+        setTimeout(() => {
+          this.adminBtn = false;
+        }, 1);
+        return;
+      }
+    }
+    this.adminBtn = false;
   }
 }

@@ -10,8 +10,8 @@ export class HttpService {
   constructor(private http: HttpClient) {}
 
   public token: TokenData;
-  private baseUrl = "http://localhost:65004/wptest_master/";
-  // private baseUrl = "https://sv-deggenhausertal.de/";
+  // private baseUrl = "http://localhost:65004/wptest_master/";
+  private baseUrl = "https://www.sv-deggenhausertal.de/";
   private apiPrefix = this.baseUrl + "wp-json/";
 
   public getApiInfo() {
@@ -41,8 +41,8 @@ export class HttpService {
   }
 
   public tokenCheck() {
-    const nodeUrl = this.baseUrl + "?rest_route=/admin/auth/validate";
     if (this.token && this.token.data.jwt) {
+      const nodeUrl = this.baseUrl + "?rest_route=/admin/auth/validate";
       return this.getAuthRequest(nodeUrl);
     }
     return null;
@@ -103,10 +103,7 @@ export class HttpService {
 
   private getAuthRequest(nodeUrl: string) {
     return this.http.get(nodeUrl, {
-      headers: new HttpHeaders().set(
-        "authorization",
-        "Bearer" + this.token.data.jwt
-      ),
+      headers: new HttpHeaders().set("authorization", this.token.data.jwt),
     });
   }
 }
