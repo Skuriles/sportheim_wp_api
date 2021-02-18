@@ -16,7 +16,6 @@ import { UploadCsvComponent } from "../upload-csv/upload-csv.component";
 import { BreakpointObserver, Breakpoints } from "@angular/cdk/layout";
 import { InfoGameComponent } from "../info-game/info-game.component";
 import { ERoles } from "../enum/roles";
-import { TranslationWidth } from "@angular/common";
 
 @Component({
   selector: "app-mainpage",
@@ -262,7 +261,9 @@ export class MainpageComponent implements OnInit {
                 .getUserRole(checkResult.data.user.ID)
                 .subscribe((info: string[]) => {
                   this.loginService.setRoles(info);
+                  this.setGui(this.isMobileScreen);
                 });
+            } else {
               this.setGui(this.isMobileScreen);
             }
           });
@@ -289,7 +290,9 @@ export class MainpageComponent implements OnInit {
             .getUserRole(result.data.user.ID)
             .subscribe((info: string[]) => {
               this.loginService.setRoles(info);
+              this.setGui(this.isMobileScreen);
             });
+        } else {
           this.setGui(this.isMobileScreen);
         }
       });
@@ -328,12 +331,12 @@ export class MainpageComponent implements OnInit {
     }
     if (this.loginService.loggedIn) {
       this.displayedColumns.push("edit");
-      this.displayedColumns.push("delete");
     }
     if (this.loginService.loggedIn) {
       if (this.loginService.userRole > ERoles.subscriber) {
         setTimeout(() => {
           this.adminBtn = true;
+          this.displayedColumns.push("delete");
         }, 1);
         return;
       }

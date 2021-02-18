@@ -65,7 +65,7 @@
       [ngClass]="{ mobileDate: isMobileScreen }"
     >
       <span *ngIf="!element.weekEndRow && !isMobileScreen">
-        {{ element.date | dateTimeToFormat: "ccc, d. MMMM yyyy - HH:mm" }}
+        {{ element.date | dateTimeToFormat: "ccc, d. MMMM yyyy - HH:mm" }} Uhr
       </span>
       <span *ngIf="!element.weekEndRow && isMobileScreen">
         {{ element.date | dateTimeToFormat: "dd.MM. - HH:mm" }}
