@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, NgZone, OnInit } from "@angular/core";
 import { MatDialog } from "@angular/material/dialog";
 import { DateTime, Settings } from "luxon";
 import { Credentials } from "../classes/credentials";
@@ -37,7 +37,8 @@ export class MainpageComponent implements OnInit {
     public dialog: MatDialog,
     public loginService: LoginService,
     private snackBar: MatSnackBar,
-    private breakpointObserver: BreakpointObserver
+    private breakpointObserver: BreakpointObserver,
+    private ngzone: NgZone,
   ) {
     Settings.defaultLocale = "de";
     breakpointObserver.observe([Breakpoints.Handset]).subscribe((result) => {
@@ -61,9 +62,10 @@ export class MainpageComponent implements OnInit {
   }
 
   private getAllGames() {
-    this.spiele = [];
-    this.allGames = [];
-    this.httpService.getAllData().subscribe((result: Spieltag[]) => {
+      this.dataSource = null;
+      this.spiele = [];
+      this.allGames = [];
+      this.httpService.getAllData().subscribe((result: Spieltag[]) => {
       // set date and sort
       for (const spiel of result) {
         spiel.date = DateTime.fromSQL(spiel.datum);
@@ -78,7 +80,8 @@ export class MainpageComponent implements OnInit {
         this.spiele.push(newGame);
       }
       this.filterGamesByDate();
-      this.dataSource = new MatTableDataSource(this.spiele);
+      this.dataSource = new MatTableDataSource<Spieltag>(this.spiele);
+      this.ngzone.run(() => {});
     });
   }
 
@@ -122,7 +125,9 @@ export class MainpageComponent implements OnInit {
         this.spiele.push(newGame);
       }
     }
-    this.dataSource = new MatTableDataSource(this.spiele);
+    const games = [...this.spiele];
+    this.dataSource = new MatTableDataSource(games);
+    this.dataSource.paginator = this.dataSource.paginator;
   }
 
   public edit(element: Spieltag) {
@@ -185,10 +190,10 @@ export class MainpageComponent implements OnInit {
       (saved: boolean) => {
         if (saved) {
           this.openSnackBar("Gespeichert", "Ok");
-          this.getAllGames();
         } else {
           this.openSnackBar("Speichern fehlgeschlagen", "Ok", "errorSnack");
         }
+        this.getAllGames();
       },
       (err) => {
         this.openSnackBar("Speichern fehlgeschlagen", "Ok", "errorSnack");
@@ -201,10 +206,10 @@ export class MainpageComponent implements OnInit {
       (saved: boolean) => {
         if (saved) {
           this.openSnackBar("Spiel angelegt", "Ok");
-          this.getAllGames();
-        } else {
+                  } else {
           this.openSnackBar("Speichern fehlgeschlagen", "Ok", "errorSnack");
         }
+        this.getAllGames();
       },
       (err) => {
         this.openSnackBar("Speichern fehlgeschlagen", "Ok", "errorSnack");
@@ -217,10 +222,10 @@ export class MainpageComponent implements OnInit {
       (saved: boolean) => {
         if (saved) {
           this.openSnackBar("Gelöscht", "Ok");
-          this.getAllGames();
         } else {
           this.openSnackBar("Löschen fehlgeschlagen", "Ok", "errorSnack");
         }
+        this.getAllGames();
       },
       (err) => {
         this.openSnackBar("Löschen fehlgeschlagen", "Ok", "errorSnack");
