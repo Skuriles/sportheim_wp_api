@@ -38,7 +38,7 @@ export class MainpageComponent implements OnInit {
     public loginService: LoginService,
     private snackBar: MatSnackBar,
     private breakpointObserver: BreakpointObserver,
-    private ngzone: NgZone,
+    private ngzone: NgZone
   ) {
     Settings.defaultLocale = "de";
     breakpointObserver.observe([Breakpoints.Handset]).subscribe((result) => {
@@ -62,15 +62,15 @@ export class MainpageComponent implements OnInit {
   }
 
   private getAllGames() {
-      this.dataSource = null;
-      this.spiele = [];
-      this.allGames = [];
-      this.httpService.getAllData().subscribe((result: Spieltag[]) => {
+    this.dataSource = null;
+    this.spiele = [];
+    this.allGames = [];
+    this.httpService.getAllData().subscribe((result: Spieltag[]) => {
       // set date and sort
       for (const spiel of result) {
         spiel.date = DateTime.fromSQL(spiel.datum);
       }
-      result.sort((a, b) => this.sortByDate(a.date, b.date));
+      result = result.sort((a, b) => this.sortByDate(a, b));
       // loop again to set correct weekend
       for (const spiel of result) {
         this.checkWeekDay(spiel);
@@ -206,7 +206,7 @@ export class MainpageComponent implements OnInit {
       (saved: boolean) => {
         if (saved) {
           this.openSnackBar("Spiel angelegt", "Ok");
-                  } else {
+        } else {
           this.openSnackBar("Speichern fehlgeschlagen", "Ok", "errorSnack");
         }
         this.getAllGames();
@@ -311,11 +311,11 @@ export class MainpageComponent implements OnInit {
     this.setGui(this.isMobileScreen);
   }
 
-  private sortByDate(a: DateTime, b: DateTime) {
-    if (a.toSeconds < b.toSeconds) {
+  private sortByDate(a: Spieltag, b: Spieltag) {
+    if (a.date.toMillis() < b.date.toMillis()) {
       return -1;
     }
-    if (a.toSeconds > b.toSeconds) {
+    if (a.date.toMillis() > b.date.toMillis()) {
       return 1;
     }
     // a muss gleich b sein
