@@ -109,9 +109,9 @@ function insert_svdapi_game(WP_REST_Request $request)
     $result = $request->get_json_params();
     $ele = $result["element"];
     $date = sanitize_text_field($ele["datum"]);
-    $mannschaft = sanitize_text_field($ele["person"]);
-    $heim = sanitize_text_field($ele["person"]);
-    $gast = sanitize_text_field($ele["person"]);
+    $mannschaft = sanitize_text_field($ele["mannschaft"]);
+    $heim = sanitize_text_field($ele["heim"]);
+    $gast = sanitize_text_field($ele["gast"]);
     $person = sanitize_text_field($ele["person"]);
     $result = $wpdb->insert(
         $table_name,
