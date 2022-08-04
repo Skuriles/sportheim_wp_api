@@ -77,9 +77,9 @@ function init_svd_api_database()
 function get_all_svdapi_data()
 {
     global $wpdb;
-    $table = $wpdb->prefix . svdTable;    
-    $results = $wpdb->get_results("SELECT * FROM $table");        
-    return $results;    
+    $table = $wpdb->prefix . svdTable;
+    $results = $wpdb->get_results("SELECT * FROM $table");
+    return $results;
 }
 
 function save_svdapi_game(WP_REST_Request $request)
@@ -192,26 +192,29 @@ function import_svdapi_game(WP_REST_Request $request)
             $headerFlag = false;
             continue;
         }
+
         // process rows in csv body
         if ($data[0]) {
             $date = sanitize_text_field($data[0]);
             $mannschaft = sanitize_text_field($data[1]);
             $heim = sanitize_text_field($data[2]);
             $gast = sanitize_text_field($data[3]);
-            $result = $wpdb->insert(
-                $table_name,
-                array(
-                    'datum' => $date,
-                    'mannschaft' => $mannschaft,
-                    'heim' => $heim,
-                    'gast' => $gast,
-                )
-            );
-            if (!$result) {
-                fclose($handle);
-                return rest_ensure_response(['success' => false]);
-            }
-        }
+            $exists = $wpdb->get_var($wpdb->prepare("SELECT * FROM $table_name WHERE datum= '" . $date . "' AND mannschaft= '" . $mannschaft . "' AND heim= '" . $heim . "' AND gast= '" . $gast . "'"));
+            if (!$exists) {
+                $result = $wpdb->insert(
+                    $table_name,
+                    array(
+                        'datum' => $date,
+                        'mannschaft' => $mannschaft,
+                        'heim' => $heim,
+                        'gast' => $gast,
+                    )
+                );
+                if (!$result) {
+                    fclose($handle);
+                    return rest_ensure_response(['success' => false]);
+                }
+            }}
 
     }
     fclose($handle);
